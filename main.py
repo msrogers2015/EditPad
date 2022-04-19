@@ -1,35 +1,40 @@
-from ctypes import resize
+from menu import data
 import tkinter as tk
-from menu import file_commands
+from menu import file_commands, edit
 
 
 class EditPad(tk.Frame):
     def __init__(self, root=None):
         # Import frame information for use within the class
         super().__init__(root)
-        self.filename = 'New File - Edit Py'
+        data.frame_title = 'New File - Edit Py'
         self.root = root
-        self.file_path = None
+        data.save_path = None
         self.window()
         self.fc = file_commands.File(root=self.root, text_window=self.text)
+        self.edit = edit.Edit(root=self.root, text_window=self.text)
         self.menu()
         self.key_binding()
         root.config(menu=self.menubar)
 
     def update_title(self, even=None):
-        self.root.title(f'* {self.filename}')
+        self.root.title(f'* {data.frame_title}')
 
     def key_binding(self):
-          self.root.bind("<Control-n>", self.fc.new)
-          self.root.bind('<KeyRelease>', self.update_title)
-          self.root.bind("<Control-s>", self.fc.save)
-          self.root.bind('<Control-q>', quit)
-
+        # File Menu Shortcuts
+        self.root.bind("<Control-n>", self.fc.new)
+        self.root.bind('<KeyRelease>', self.update_title)
+        self.root.bind("<Control-s>", self.fc.save)
+        self.root.bind("<Control-S>", self.fc.save_as)
+        self.root.bind("<Control-o>", self.fc.open_file)
+        self.root.bind('<Control-q>', quit)
+        # Edit Menu Shortcuts
+        #self.root.bind("<Control-z>", self.edit.undo)
 
     def window(self):
         """This created the main frame of the app
         where users can edit text documents"""
-        self.text = tk.Text(self.root, wrap="none")
+        self.text = tk.Text(self.root, wrap="none", undo=True, autoseparators=True)
         self.text.pack(fill="both", expand=True)
 
     def menu(self):
@@ -48,7 +53,7 @@ class EditPad(tk.Frame):
         self.filemenu.add_command(label="Save             (Ctrl+S)", command=self.fc.save)
         self.filemenu.add_command(label="Save As...     (Ctrl+Shift+S)")
         self.filemenu.add_separator()
-        self.filemenu.add_command(label="Open             (Ctrl+O)")
+        self.filemenu.add_command(label="Open             (Ctrl+O)", command=self.fc.open_file)
         self.filemenu.add_command(label="Exit               (Ctrl+Q)", command=quit)
         # Edit Menu
         self.editmenu.add_command(label="Undo       (Ctrl+Z)")

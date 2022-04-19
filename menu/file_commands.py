@@ -1,5 +1,6 @@
 import tkinter as tk
-from tkinter import filedialog
+from menu import data
+from tkinter import INSERT, filedialog
 
 
 class File(tk.Frame):
@@ -12,18 +13,38 @@ class File(tk.Frame):
         self.root.title("New File - EditPy")
         self.text_window.delete("1.0", "end")
 
-    def save(self, event=None, file_path=None):
-        if file_path == None:
+    def save(self, event=None):
+        # Check filepath to see if its empty
+        if data.save_path == None:
+            # If empty, ask for file path
             save_path = filedialog.asksaveasfilename(
                 filetypes=(("Text Document", "*.txt"), ("Python", "*.py")),
                 defaultextension=".txt",
-                title=("Choose name for File"),
+                title=("Save File..."),
             )
-        with open(save_path, 'w') as file_to_save:
+            # Save path for futher saves
+            data.save_path = save_path
+        # Save file
+        with open(data.save_path, 'w') as file_to_save:
             file_to_save.write(self.text_window.get("1.0", "end-1c"))
 
-    def save_as(self):
-        pass
+    def save_as(self, event=None):
+        # If empty, ask for file path
+        save_path = filedialog.asksaveasfilename(
+            filetypes=(("Text Document", "*.txt"), ("Python", "*.py")),
+            defaultextension=".txt",
+            title=("Save File..."),
+        )
+        # Save path for futher saves
+        data.save_path = save_path
+        # Save file
+        with open(data.save_path, 'w') as file_to_save:
+            file_to_save.write(self.text_window.get("1.0", "end-1c"))
 
-    def open_file(self):
-        pass
+    def open_file(self, event=None):
+        data.save_path = filedialog.askopenfilename()
+        print(data.save_path)
+        self.text_window.delete("1.0", "end")
+        with open(data.save_path,'r') as file:
+            file_text = file.read()
+            self.text_window.insert(INSERT, file_text)
